@@ -134,6 +134,28 @@ if (!isset($_SESSION['username'])) {
             </form>
         </div>
     </div>
+    <!-- Modal de Confirmación para Eliminar -->
+    <div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" role="dialog"
+        aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content border-danger">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmarEliminarLabel">¿Eliminar pedido?</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Esta acción no se puede deshacer. ¿Deseas continuar?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button id="btnEliminarConfirmado" type="button" class="btn btn-danger">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
 

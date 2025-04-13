@@ -1,5 +1,6 @@
 let modoEdicion = false;
 let tarjetaEnEdicion = null;
+let tarjetaAEliminar = null;
 
 
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -10,43 +11,43 @@ let currentProject = '';
 
 function loadProjects() {
     fetch('projects.json')
-    .then(response => response.json())
-    .then(projects => {
-        const projectList = document.getElementById('project-list');
-        projects.forEach(project => {
-            let projectItem = document.createElement('a');
-            projectItem.className = 'list-group-item list-group-item-action';
-            projectItem.innerText = project.name;
-            projectItem.id = project.id;
-            projectItem.onclick = () => {
-                loadKanbanBoard(project.id);
-            };
-            projectList.appendChild(projectItem);
-        });
+        .then(response => response.json())
+        .then(projects => {
+            const projectList = document.getElementById('project-list');
+            projects.forEach(project => {
+                let projectItem = document.createElement('a');
+                projectItem.className = 'list-group-item list-group-item-action';
+                projectItem.innerText = project.name;
+                projectItem.id = project.id;
+                projectItem.onclick = () => {
+                    loadKanbanBoard(project.id);
+                };
+                projectList.appendChild(projectItem);
+            });
 
-        if (projects.length > 0) {
-            loadKanbanBoard(projects[0].id); // Load the first project by default
-        }
-    });
+            if (projects.length > 0) {
+                loadKanbanBoard(projects[0].id); // Load the first project by default
+            }
+        });
 }
 
 function loadKanbanBoard(projectId) {
     currentProject = projectId;
     fetch(`data-${projectId}.json`)
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('todo').innerHTML = '';
-        document.getElementById('inprogress').innerHTML = '';
-        document.getElementById('done').innerHTML = '';
-        for (let columnId in data) {
-            let column = document.getElementById(columnId);
-            for (let cardData of data[columnId]) {
-                let cardElement = createCardElement(cardData);
-                column.appendChild(cardElement);
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('todo').innerHTML = '';
+            document.getElementById('inprogress').innerHTML = '';
+            document.getElementById('done').innerHTML = '';
+            for (let columnId in data) {
+                let column = document.getElementById(columnId);
+                for (let cardData of data[columnId]) {
+                    let cardElement = createCardElement(cardData);
+                    column.appendChild(cardElement);
+                }
             }
-        }        
-        updateActiveProject(projectId);
-    });
+            updateActiveProject(projectId);
+        });
 }
 
 function updateActiveProject(projectId) {
@@ -88,7 +89,7 @@ const defaultSubmitHandler = function (e) {
     const mensaje = formData.get('mensaje');
     const celular = formData.get('celular');
     const entrega = formatFechaHora(formData.get('entrega'));
-    const fecha_pago = formatFechaSimple(formData.get('fecha_pago'));    
+    const fecha_pago = formatFechaSimple(formData.get('fecha_pago'));
     const precio = formData.get('precio');
     const adelanto = formData.get('adelanto');
     const medio_pago = formData.get('medio_pago');
@@ -201,10 +202,8 @@ function createCardElement(data, customId = null) {
 
     // Botón Eliminar
     card.querySelector('.btn-danger').addEventListener('click', () => {
-        if (confirm("¿Estás seguro de que deseas eliminar este pedido?")) {
-            card.remove();
-            saveCards();
-        }
+        tarjetaAEliminar = card;
+        $('#modalConfirmarEliminar').modal('show');
     });
 
     // Botón Editar
@@ -286,7 +285,7 @@ function drop(ev) {
     ev.preventDefault();
     var data = ev.dataTransfer.getData("text");
     var card = document.getElementById(data);
-    
+
     if (ev.target.className.includes('kanban-cards')) {
         ev.target.appendChild(card);
         saveCards();
@@ -373,3 +372,12 @@ function generateId() {
 
 document.addEventListener('dragover', allowDrop);
 document.addEventListener('drop', drop);
+
+document.getElementById('btnEliminarConfirmado').addEventListener('click', () => {
+    if (tarjetaAEliminar) {
+        tarjetaAEliminar.remove();
+        saveCards();
+        tarjetaAEliminar = null;
+        $('#modalConfirmarEliminar').modal('hide');
+    }
+});
