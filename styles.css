@@ -10,8 +10,11 @@ body {
 }
 
 .container-fluid {
-    height: 100vh;
+    padding-top: 25px;
+    margin-top: 20px; /* NUEVO: esto separa las columnas del navbar */
 }
+
+
 
 .bg-image {
     position: relative;

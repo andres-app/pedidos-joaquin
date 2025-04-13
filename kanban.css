@@ -1,6 +1,6 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+    background-color: #f3f3f3;
     margin: 0;
     padding: 0;
 }
@@ -37,82 +37,109 @@ body {
     border: none;
 }
 
-#sidebar-wrapper .list-group-item:hover, #sidebar-wrapper .list-group-item.active {
+#sidebar-wrapper .list-group-item:hover,
+#sidebar-wrapper .list-group-item.active {
     background-color: #d1ecf1;
     color: #0c5460;
 }
 
+.container-fluid {
+    padding-top: 25px;
+    margin-top: 20px; /* NUEVO: esto separa las columnas del navbar */
+}
+
 #page-content-wrapper {
     width: calc(100% - 250px);
-    padding: 20px;
+    padding: 40px 30px 30px;
     transition: all 0.5s;
 }
 
 .kanban-cards {
-    min-height: 150px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    padding: 10px;
+    min-height: 300px;
+    padding: 15px;
+    background-color: #f1f1f1;
+    border-radius: 15px;
     margin-bottom: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .kanban-card {
-    background-color: #e9ecef;
-    margin: 5px 0;
-    padding: 10px;
-    border-radius: 5px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 14px;
     cursor: move;
-    border: 1px solid #ced4da;
-    position: relative;
-    transition: background-color 0.3s;
 }
 
-.kanban-card:hover {
-    background-color: #dee2e6;
+.kanban-card h5 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
 }
 
-.assignee {
-    margin-top: 10px;
-    font-size: 0.9em;
-    color: #6c757d;
+.kanban-card p {
+    margin: 5px 0;
 }
 
-.assign-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 0.8em;
-    padding: 3px 6px;
-    background-color: transparent;
+.kanban-card .text-muted {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.kanban-card button {
     border: none;
-    color: #007bff;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    margin: 5px 4px;
     cursor: pointer;
-    transition: color 0.3s;
 }
 
-.assign-button:hover {
-    
-    text-decoration: underline;
+.kanban-card .btn-warning {
+    background-color: #f6c23e;
+    color: #fff;
 }
 
-.container-fluid {
-    padding-top: 25px;
+.kanban-card .btn-danger {
+    background-color: #e74a3b;
+    color: #fff;
 }
 
-/* Estilos adicionales para el botón en la barra de navegación */
-.navbar .btn-primary {
-    margin-left: 10px; /* Espacio entre el botón de menú y el botón de añadir tarea */
+/* Estilo por columna */
+.col-md-4:nth-child(1) h4 {
+    background-color: #d8d8d8;
+    padding: 8px;
+    text-align: center;
+    border-radius: 8px;
+    color: #555;
 }
 
+.col-md-4:nth-child(2) h4 {
+    background-color: #b6efb1;
+    padding: 8px;
+    text-align: center;
+    border-radius: 8px;
+    color: #3a773a;
+}
 
-@media (max-width: 767.98px) {
+.col-md-4:nth-child(3) h4 {
+    background-color: #f7b7b7;
+    padding: 8px;
+    text-align: center;
+    border-radius: 8px;
+    color: #a04141;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
     #sidebar-wrapper {
         width: 100%;
         height: auto;
         margin-left: 0;
-        box-shadow: none;
-        border-bottom: 1px solid #ddd;
     }
 
     #page-content-wrapper {
@@ -120,17 +147,11 @@ body {
     }
 
     .kanban-cards {
-        min-height: 100px;
+        padding: 10px;
+        min-height: 200px;
     }
 
     .kanban-card {
-        margin: 3px 0;
-        padding: 5px;
+        padding: 15px;
     }
-
-    .assign-button {
-        font-size: 0.7em;
-        padding: 2px 4px;
-    }
-    
 }
