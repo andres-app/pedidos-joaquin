@@ -67,9 +67,10 @@ document.getElementById('formNuevaTarea').addEventListener('submit', function (e
     const formData = new FormData(this);
 
     const cliente = formData.get('cliente');
+    const mensaje = formData.get('mensaje');
     const celular = formData.get('celular');
-    const entrega = formData.get('entrega');
-    const fecha_pago = formData.get('fecha_pago');
+    const entrega = formatFechaHora(formData.get('entrega'));
+    const fecha_pago = formatFechaSimple(formData.get('fecha_pago'));    
     const precio = formData.get('precio');
     const adelanto = formData.get('adelanto');
     const medio_pago = formData.get('medio_pago');
@@ -81,8 +82,9 @@ document.getElementById('formNuevaTarea').addEventListener('submit', function (e
         fecha_pago,
         precio,
         adelanto,
-        medio_pago
-    };
+        medio_pago,
+        mensaje
+    };    
 
     const card = createCardElement(newCardData);
     document.getElementById(targetColumn).prepend(card);
@@ -103,26 +105,37 @@ function createCardElement(data) {
         fecha_pago = '',
         precio = '',
         adelanto = '',
-        medio_pago = ''
+        medio_pago = '',
+        mensaje = ''
     } = data;
 
     const card = document.createElement('div');
-    card.className = 'kanban-card p-2 mb-2 bg-light border rounded';
+    card.className = 'kanban-card p-3 mb-3 rounded shadow-sm text-center';
     card.draggable = true;
     card.id = generateId();
     card.ondragstart = drag;
 
     card.innerHTML = `
-        <div><strong>${cliente}</strong></div>
-        <div class="text-muted mb-2">${celular}</div>
-        <div><strong>Entrega:</strong> ${entrega}</div>
-        <div><strong>Pago:</strong> ${fecha_pago}</div>
-        <div><strong>Precio:</strong> S/.${precio} | <strong>Adelanto:</strong> S/.${adelanto}</div>
-        <div><strong>Medio:</strong> ${medio_pago}</div>
+        <div class="text-muted">${celular}</div>
+        <h5 class="font-weight-bold mb-2">${cliente}</h5>
+
+        <div class="text-left">
+            <p><strong>Entregar el:</strong> ${entrega}</p>
+            <p><strong>Mensaje:</strong> ${mensaje || '-'}</p>
+            <p><strong>Precio:</strong> S/.${precio} <br><strong>Adelanto:</strong> S/.${adelanto}</p>
+            <p><strong>Medio de pago:</strong> ${medio_pago}</p>
+            <p><strong>Fecha de pago:</strong> ${fecha_pago}</p>
+        </div>
+
+        <div class="d-flex justify-content-around mt-2">
+            <button class="btn btn-sm btn-warning">Editar</button>
+            <button class="btn btn-sm btn-danger">Eliminar</button>
+        </div>
     `;
 
     return card;
 }
+
 
 
 
@@ -158,6 +171,29 @@ function drop(ev) {
     }
 }
 
+function formatFechaHora(fechaISO) {
+    if (!fechaISO) return '';
+    const fecha = new Date(fechaISO);
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const anio = fecha.getFullYear();
+    let horas = fecha.getHours();
+    const minutos = fecha.getMinutes().toString().padStart(2, '0');
+    const ampm = horas >= 12 ? 'PM' : 'AM';
+    horas = horas % 12 || 12;
+    return `${dia}/${mes}/${anio} ${horas}:${minutos} ${ampm}`;
+}
+
+function formatFechaSimple(fechaISO) {
+    if (!fechaISO) return '';
+    const fecha = new Date(fechaISO);
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const anio = fecha.getFullYear();
+    return `${dia}/${mes}/${anio}`;
+}
+
+
 function saveCards() {
     let columns = document.getElementsByClassName('kanban-cards');
     let data = {
@@ -169,23 +205,29 @@ function saveCards() {
     for (let column of columns) {
         let columnId = column.id;
         for (let card of column.children) {
-            let cliente = card.querySelector('div:nth-child(1)')?.innerText?.split('\n')[0] || '';
-            let celular = card.querySelector('div:nth-child(1) small')?.innerText || '';
-            let entrega = card.querySelector('div:nth-child(2)')?.innerText?.replace('Entrega: ', '') || '';
-            let fecha_pago = card.querySelector('div:nth-child(3)')?.innerText?.replace('Pago: ', '') || '';
-            let precios = card.querySelector('div:nth-child(4)')?.innerText?.match(/([\d.,]+)/g) || [];
-            let medio_pago = card.querySelector('div:nth-child(5)')?.innerText?.replace('Medio: ', '') || '';
-            let precio = precios[0] || '';
-            let adelanto = precios[1] || '';
+            const campos = card.querySelectorAll('div');
+
+            const celular = campos[0]?.innerText.trim();
+            const cliente = card.querySelector('h5')?.innerText.trim();
+
+            // Extraemos los campos del bloque de información
+            const info = card.querySelectorAll('.text-left p');
+            const entrega = info[0]?.innerText.replace('Entregar el:', '').trim();
+            const mensaje = info[1]?.innerText.replace('Mensaje:', '').trim();
+            const precio = info[2]?.innerText.match(/S\/\.(\d+\.?\d*)/)?.[1] || '';
+            const adelanto = info[2]?.innerText.match(/Adelanto: S\/\.(\d+\.?\d*)/)?.[1] || '';
+            const medio_pago = info[3]?.innerText.replace('Medio de pago:', '').trim();
+            const fecha_pago = info[4]?.innerText.replace('Fecha de pago:', '').trim();
 
             data[columnId].push({
                 cliente,
                 celular,
                 entrega,
-                fecha_pago,
+                mensaje,
                 precio,
                 adelanto,
-                medio_pago
+                medio_pago,
+                fecha_pago
             });
         }
     }

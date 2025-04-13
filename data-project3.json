@@ -1,16 +1,5 @@
 {
-    "todo": [
-      {
-        "cliente": "Joaquín Ahumada",
-        "celular": "986634352",
-        "entrega": "24/09/2025 03:15PM",
-        "fecha_pago": "19/09/2025",
-        "precio": "300.00",
-        "adelanto": "150.00",
-        "medio_pago": "Yape"
-      }
-    ],
+    "todo": [],
     "inprogress": [],
     "done": []
-  }
-  
+}
