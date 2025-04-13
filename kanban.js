@@ -36,11 +36,11 @@ function loadKanbanBoard(projectId) {
         document.getElementById('done').innerHTML = '';
         for (let columnId in data) {
             let column = document.getElementById(columnId);
-            for (let card of data[columnId]) {
-                let cardElement = createCardElement(card.text, card.assignee);
+            for (let cardData of data[columnId]) {
+                let cardElement = createCardElement(cardData);
                 column.appendChild(cardElement);
             }
-        }
+        }        
         updateActiveProject(projectId);
     });
 }
@@ -53,28 +53,78 @@ function updateActiveProject(projectId) {
     document.getElementById(projectId).classList.add('active');
 }
 
+let targetColumn = 'todo'; // por defecto
+
 function addCard(columnId) {
-    let cardText = prompt("Ingrese la descripción de la tarea:");
-    if (cardText) {
-        let cardElement = createCardElement(cardText, '');
-        document.getElementById(columnId).appendChild(cardElement);
-        saveCards();
-    }
+    targetColumn = columnId;
+    $('#modalNuevaTarea').modal('show');
 }
 
-function createCardElement(text, assignee) {
-    let card = document.createElement('div');
-    card.className = 'kanban-card';
+
+document.getElementById('formNuevaTarea').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    const cliente = formData.get('cliente');
+    const celular = formData.get('celular');
+    const entrega = formData.get('entrega');
+    const fecha_pago = formData.get('fecha_pago');
+    const precio = formData.get('precio');
+    const adelanto = formData.get('adelanto');
+    const medio_pago = formData.get('medio_pago');
+
+    const newCardData = {
+        cliente,
+        celular,
+        entrega,
+        fecha_pago,
+        precio,
+        adelanto,
+        medio_pago
+    };
+
+    const card = createCardElement(newCardData);
+    document.getElementById(targetColumn).prepend(card);
+
+    saveCards();
+    $('#modalNuevaTarea').modal('hide');
+    this.reset();
+});
+
+
+
+
+function createCardElement(data) {
+    const {
+        cliente = '',
+        celular = '',
+        entrega = '',
+        fecha_pago = '',
+        precio = '',
+        adelanto = '',
+        medio_pago = ''
+    } = data;
+
+    const card = document.createElement('div');
+    card.className = 'kanban-card p-2 mb-2 bg-light border rounded';
     card.draggable = true;
-    card.innerHTML = `
-        <div>${text}</div>
-        <div class="assignee">${assignee ? '<span class="badge bg-success text-white">Asignado: ' + assignee + '</span>' : ''}</div>
-        <button class="assign-button" onclick="assignTask(this)">Asignar</button>
-    `;
     card.id = generateId();
     card.ondragstart = drag;
+
+    card.innerHTML = `
+        <div><strong>${cliente}</strong></div>
+        <div class="text-muted mb-2">${celular}</div>
+        <div><strong>Entrega:</strong> ${entrega}</div>
+        <div><strong>Pago:</strong> ${fecha_pago}</div>
+        <div><strong>Precio:</strong> S/.${precio} | <strong>Adelanto:</strong> S/.${adelanto}</div>
+        <div><strong>Medio:</strong> ${medio_pago}</div>
+    `;
+
     return card;
 }
+
+
 
 function assignTask(button) {
     let assignee = prompt("Ingrese el nombre de la persona asignada:");
@@ -119,11 +169,24 @@ function saveCards() {
     for (let column of columns) {
         let columnId = column.id;
         for (let card of column.children) {
-            let cardData = {
-                text: card.children[0].innerText,
-                assignee: card.children[1].innerText.replace(/Asignado:? ?a?:? /gi, '').trim() // Remove span tags
-            };
-            data[columnId].push(cardData);
+            let cliente = card.querySelector('div:nth-child(1)')?.innerText?.split('\n')[0] || '';
+            let celular = card.querySelector('div:nth-child(1) small')?.innerText || '';
+            let entrega = card.querySelector('div:nth-child(2)')?.innerText?.replace('Entrega: ', '') || '';
+            let fecha_pago = card.querySelector('div:nth-child(3)')?.innerText?.replace('Pago: ', '') || '';
+            let precios = card.querySelector('div:nth-child(4)')?.innerText?.match(/([\d.,]+)/g) || [];
+            let medio_pago = card.querySelector('div:nth-child(5)')?.innerText?.replace('Medio: ', '') || '';
+            let precio = precios[0] || '';
+            let adelanto = precios[1] || '';
+
+            data[columnId].push({
+                cliente,
+                celular,
+                entrega,
+                fecha_pago,
+                precio,
+                adelanto,
+                medio_pago
+            });
         }
     }
 
@@ -135,6 +198,7 @@ function saveCards() {
         body: JSON.stringify(data)
     });
 }
+
 
 function generateId() {
     return 'card-' + Math.random().toString(36).substr(2, 9);

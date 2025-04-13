@@ -1,14 +1,1 @@
-{
-    "todo": [
-        {
-            "text": "Tarea 3",
-            "assignee": "Carlos"
-        },
-        {
-            "text": "tarea nueva allsale",
-            "assignee": "Pedro"
-        }
-    ],
-    "inprogress": [],
-    "done": []
-}
+{"todo":[{"cliente":"Andres","celular":"","entrega":"987654321","fecha_pago":"Entrega: 2025-04-13T16:18","precio":"2025","adelanto":"04","medio_pago":"Precio: S\/.800 | Adelanto: S\/.100"}],"inprogress":[],"done":[]}
